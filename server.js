@@ -39,6 +39,46 @@ app.get("/me", (req, res) => {
   });
 });
 
+//In-memory store (reset on server restart)
+const projects = [];
+let seq = 1;
+
+// GET /projects
+
+app.get("/projects", (_req, res)=>{
+    return res.json({item:projects});
+});
+
+//GET /projects/:id
+// single project by id
+
+app.get("/projects/:id", (req, res) =>{
+    const id = Number(req.params.id);
+    const found = projects.find(p=> p.id === id);
+    if(!found) return res.status(404).json({error : "project not found"});
+    return res.json(found);
+});
+
+//Post /projects
+// create project
+// Body : {title: string, summary? : string}
+
+app.post("/projects", (req, res) => {
+    const {title, summary}= req.body || {};
+    if(!title || typeof title !== "string" || title.trim().length < 2) {
+        return res.status(400).json({ error : "title required (min length = 2"});
+    }
+
+    const project = {
+        id : seq++,
+        title : title.trim(),
+        summary: typeof summary === "string" ? summary.trim() : "",
+        createdAt : new Date().toISOString(),
+    };
+    projects.push(project);
+    return res.status(201).json(project);
+})
+
 // 404  handler
 app.use((_req, res)=>{
     return res.status(404).json({error : "Not Found"});
