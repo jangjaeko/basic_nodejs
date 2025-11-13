@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---- 여기가 실제 DB 테이블 정의 ----
+model Project {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String?   @unique
+  summary   String
+  content   String
+  coverUrl  String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
